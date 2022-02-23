@@ -6,7 +6,7 @@ function printMyMessage(message) {
 }
 
 function welcome() {
-    console.log('Welcome to my application. I am Sabiha and a part of FunctionUp Thorium cohort')
+    console.log('Welcome to my application. I am Atif Faruque and a part of FunctionUp Thorium cohort')
 }
 
 module.exports.url = url
