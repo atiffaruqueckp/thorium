@@ -1,24 +1,43 @@
 const { count } = require("console")
-const authorModel = require("../models/authorModel")
-const bookModel= require("../models/bookModel")
+const authorModel = require("../models/authorModel.js")
+const bookModel= require("../models/bookModel.js")
+const publisherModel= require("../models/publisherModel.js")
+const mongoose = require("mongoose");
+
 
 const createBook= async function (req, res) {
-    let book = req.body
-    let bookCreated = await bookModel.create(book)
-    res.send({data: bookCreated})
+    let authorId = req.body.author_id
+    let publisherId = req.body.publisher_id
+    
+    const authorDetails = await authorModel.findById(authorId)
+    const publisherDetails = await publisherModel.findById(publisherId)
+
+    if(req.body.hasOwnProperty("author_id")) {
+        if(authorDetails === undefined) {
+            return res.send({msg: "Author is not present"})
+        } else {
+            if(req.body.hasOwnProperty("publisher_id")) {
+                if(publisherDetails === undefined) {
+                    return res.send({msg: "Publisher is not present"})
+                } else {
+                    let bookCreated = await bookModel.create(req.body)
+                    return res.send({data: bookCreated})
+                }
+            } else {
+                return res.send({msg: "Publisher id is required"})
+            }
+        }
+    }
+    else {
+        return res.send({msg: "Author id is required"})
+    }
 }
 
-const getBooksData= async function (req, res) {
-    let books = await bookModel.find()
-    res.send({data: books})
-}
+const getBooksWithAuthor = async function (req, res) {
+    let allBooks = await bookModel.find().populate('author_id').populate('publisher_id');
+    res.send({data: allBooks});
+};
 
-const getBooksWithAuthorDetails = async function (req, res) {
-    let specificBook = await bookModel.find().populate('author_id')
-    res.send({data: specificBook})
-
-}
 
 module.exports.createBook= createBook
-module.exports.getBooksData= getBooksData
-module.exports.getBooksWithAuthorDetails = getBooksWithAuthorDetails
+module.exports.getBooksWithAuthor = getBooksWithAuthor
