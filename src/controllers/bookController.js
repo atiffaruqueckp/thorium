@@ -1,24 +1,45 @@
 const { count } = require("console")
-const authorModel = require("../models/authorModel")
-const bookModel= require("../models/bookModel")
+const authorModel = require("../models/authorModel.js")
+const bookModel= require("../models/bookModel.js")
+const publisherModel= require("../models/publisherModel.js")
+const mongoose = require("mongoose");
+
 
 const createBook= async function (req, res) {
     let book = req.body
-    let bookCreated = await bookModel.create(book)
-    res.send({data: bookCreated})
-}
+    const bookDetails = await bookModel.create(book)
+    return res.send({msg: bookDetails})
 
-const getBooksData= async function (req, res) {
-    let books = await bookModel.find()
-    res.send({data: books})
-}
+};
 
-const getBooksWithAuthorDetails = async function (req, res) {
-    let specificBook = await bookModel.find().populate('author_id')
-    res.send({data: specificBook})
+const hardCover = async function (req, res) {
+    let allBooks = await publisherModel.find({name: {$in: ["Penguin", "HarperCollins"] } } )
+    let same = []
+    for(let i=0; i<allBooks.length; i++)
+        same.push(allBooks[i]._id)
+    let books = await bookModel.updateMany(
+        {publisher_id: {$in: same } },
+        {$set: req.body},
+        {$new: true}
+    )
+    res.send({data: books});    
+    }
 
-}
+    const ratings = async function(req, res) {
+        let ratings = await authorModel.find( { rating: {$gt: 3.5} } )
+        let same = []
+        for(let i=0; i<ratings.length; i++)
+        same.push(ratings[i]._id)
+        let newBooks = await bookModel.updateMany(
+            {author_id: {$in: same}},
+            {$inc: req.body},
+            {$new: true}
+        )
+        let bookss = await bookModel.find({ author_id: {$in: same} } )
+        return res.send({msg: bookss})
+    }
+
 
 module.exports.createBook= createBook
-module.exports.getBooksData= getBooksData
-module.exports.getBooksWithAuthorDetails = getBooksWithAuthorDetails
+module.exports.hardCover = hardCover
+module.exports.ratings = ratings
