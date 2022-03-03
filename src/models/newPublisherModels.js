@@ -6,6 +6,6 @@ const publisherSchema = new mongoose.Schema( {
     
     headQuarter:String
 
-}, { timestamps: true});
+});
 
 module.exports = mongoose.model('Publisher', publisherSchema)
