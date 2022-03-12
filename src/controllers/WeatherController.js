@@ -28,5 +28,21 @@ let getSortedCities = async function (req, res) {
         res.status(500).send({ status: false, msg: "server error" })
     }
 }
+let memeHandler = async function (req, res){
+
+try{
+    let options = {
+        method: "post",
+        url: "https://api.imgflip.com/caption_image?template_id=216951317&text0=PLEASE NO WAR&username=chewie12345&password=meme@123"
+    }
+    let result = await axios(options)
+    res.send ({data: result.data})
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({status: false, msg: "server error"})
+    }
+}
+
 module.exports.getSortedCities = getSortedCities
+module.exports.memeHandler = memeHandler
     
