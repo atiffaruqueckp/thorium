@@ -6,9 +6,8 @@ const createBlog= async function (req, res) {
     let blog = req.body
     let id = blog.authorId;
     let authorCheck = await AuthorModel.findOne({_id:{$eq:id}});
-    if(id===undefined){
-        return res.status(400).send("Please provide Author details.")
-    }else if (authorCheck===null){
+    
+    if (authorCheck===null){
         return res.status(400).send("Author do not exist.")
     }else{
     let blogCreated = await BlogModel.create(blog)
@@ -18,7 +17,7 @@ const createBlog= async function (req, res) {
 
 const getBlogs= async function (req, res) {
     let filter = req.query;
-    let blogs = await BlogModel.find({$and:[filter,{isDeleted:false},{isPublished: true}]})//.populate(authorId)
+    let blogs = await BlogModel.find({$and:[filter,{isDeleted:false},{isPublished: true}]}).populate("authorId")
     res.status(200).send({data: blogs})
 }
 
