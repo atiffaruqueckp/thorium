@@ -12,7 +12,7 @@ const authCheck = function (req,res,next){
         if(authorId!=decodedToken.authorId) return res.status(401).send({status: false, msg: "You are not authorized to access this part."})
         next();
     }catch(error){
-        return res.status(500).send({ msg: "Error", error: err.message })
+        return res.status(500).send({ msg: "Error", error: error.message })
     }
 }
 

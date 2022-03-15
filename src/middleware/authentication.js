@@ -10,7 +10,7 @@ const authenticate = function (req,res,next){
         
         next();
     }catch(error){
-        return res.status(500).send({ msg: "Error", error: err.message })
+        return res.status(500).send({ msg: "Error", error: error.message })
     }
 }
 
