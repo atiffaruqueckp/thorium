@@ -1,4 +1,4 @@
-
+const jwt = require("jsonwebtoken");
 const AuthorModel = require("../models/AuthorModel")
 const BlogModel= require("../models/BlogModel")
 
@@ -107,8 +107,35 @@ try{
     return res.status(500).send({msg: "Error", error:error.message})
 }
 }
+
+const loginAuthor = async function (req, res) {
+try{
+    let email = req.body.email;
+    let password = req.body.password;
+    if(!email||!password){
+        res.status(400).send({msg:"Please input both email and password."})
+    }
+    let author = await AuthorModel.findOne({ email: email, password: password });
+        if (!author)
+        return res.status(404).send({
+            status: false,
+            msg: "email or the password is not correct",
+        });
+    let token = jwt.sign(
+        {
+            authorId: author._id.toString()
+        },
+        "iamtheowner"
+    );
+    res.setHeader("x-api-key", token);
+    return res.status(201).send({ status: true, data: token });
+}catch(error){
+    return res.status(500).send({ msg: "Error", error: error.message })
+}
+  };
 module.exports.createBlog= createBlog
 module.exports.getBlogs= getBlogs
 module.exports.updateBlogs = updateBlogs
 module.exports.deleteBlogs = deleteBlogs
 module.exports.deleteCategory = deleteCategory
+module.exports.loginAuthor = loginAuthor
