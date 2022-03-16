@@ -12,7 +12,7 @@ router.post("/authors", authorController.createAuthor)
 
 router.get("/getAuthorsData", authorController.getAuthorsData)
 
-router.post("/blogs", blogController.createBlog)
+router.post("/blogs", authenticate.authenticate, blogController.createBlog)
 
 router.get("/blogs", authenticate.authenticate, blogController.getBlogs)
 

@@ -94,16 +94,52 @@ try{
 
 }
 
-const deleteCategory = async function(req,res){
-try{
-    let filters = req.query
-    let blogs = await BlogModel.updateMany({$and:[filters,{isDeleted:false}]},{$set:{isDeleted:true,deletedAt: Date.now()}})
-    if(blogs===null){
-        return res.status(404).send({status:false, msg:"not found"});
-    }else{
-        return res.status(200).send({status: true, msg:"done"})
-    }
-}catch(error){
+const deleteCategory= async function(req,res)
+{
+        
+    try{
+        let filter=req.query;
+        let data= await BlogsModel.findOneAndUpdate({filter},
+            {$set:{isDeleted:true,deletedAt:Date.now()}},
+            {new:true})
+        if(data.length===0)
+        {
+            return res.status(404).send({status:false,msg:"No data found"})    
+        }
+        if(filter.tags==undefined && filter.subcategory==undefined){
+            let blogs = await BlogsModel.findOneAndUpdate({filter},
+                {$set:{isDeleted:true,deletedAt:Date.now()}},
+                {new:true})
+            return res.status(200).send({ status:true,msg: "deleted"})
+        }
+        if(filter.tags!=undefined && filter.subcategory==undefined){
+            let tags = filter.tags
+            delete filter.tags;
+            let blogs = await BlogsModel.findOneAndUpdate({$and:[{tags:{$in:[tags]}},filter]},
+                {$set:{isDeleted:true,deletedAt:Date.now()}},
+                {new:true})
+                return res.status(200).send({ status:true,msg: "deleted"})
+        }
+        if(filter.tags==undefined && filter.subcategory!=undefined){
+            let subCat = filter.subcategory
+            delete filter.subcategory;
+            let blogs = await BlogsModel.findOneAndUpdate({$and:[{subcategory:{$in:[subCat]}},filter]},
+                {$set:{isDeleted:true,deletedAt:Date.now()}},
+                {new:true})
+                return res.status(200).send({ status:true,msg: "deleted"})
+        }
+        if(filter.tags!=undefined && filter.subcategory!=undefined){
+            let subCat = filter.subcategory
+            let tags = filter.tags
+            delete filter.subcategory;
+            delete filter.tags
+            let blogs = await BlogsModel.findOneAndUpdate({$and:[{tags:{$in:[tags]}},{subcategory:{$in:[subCat]}},filter]},
+                {$set:{isDeleted:true,deletedAt:Date.now()}},
+                {new:true})
+                return res.status(200).send({ status:true,msg: "deleted"})
+        }
+    }   
+catch(error){
     return res.status(500).send({msg: "Error", error:error.message})
 }
 }
