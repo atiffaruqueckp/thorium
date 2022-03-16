@@ -10,6 +10,8 @@ const authorize = require("../middleware/authorization")
 
 router.post("/authors", authorController.createAuthor)
 
+router.post("/login", authorController.loginAuthor)
+
 router.post("/blogs", authenticate.authenticate, blogController.createBlog)
 
 router.get("/blogs", authenticate.authenticate, blogController.getBlogs)
@@ -20,7 +22,7 @@ router.delete("/blogs/:blogsId/:authorId",authenticate.authenticate,authorize.au
 
 router.delete("/blogs/:authorId",authenticate.authenticate,authorize.authCheck, blogController.deleteCategory)
 
-router.post("/login", authorController.loginAuthor)
+
 
 
 module.exports = router;

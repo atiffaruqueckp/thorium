@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const AuthorModel= require("../models/AuthorModel");
 const validator = require("email-validator");
 
@@ -27,7 +28,7 @@ const loginAuthor = async function (req, res) {
             return res.status(400).send({msg:"Please input both email and password."})
         }
         let author = await AuthorModel.findOne({ email: email, password: password });
-            if (Object.keys(author).length===0){
+            if (!author){
                 return res.status(404).send({
                     status: false,
                     msg: "email or the password is not correct",
