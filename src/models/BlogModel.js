@@ -10,7 +10,7 @@ const bookSchema = new mongoose.Schema( {
         required: true}, 
     authorId: {
         type: ObjectId,
-        ref: "Author",
+        ref: "Authors",
         required: true}, 
     tags: {
         type: [String]}, 
