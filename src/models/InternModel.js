@@ -13,7 +13,7 @@ const CreateIntern = new mongoose.Schema(
             required: true,
             trim: true,
             unique: true,
-            match: [/^\w+([\.-]?\w+)@\w+([\. -]?\w+)(\.\w{2,3})+$/,
+            match: [/^\w+([\.-]?\w+)@\w+([\. -]?\w+)(\.\w{2,3})+$/,  //+ = valid character for email
                 "Please fill a valid email address",
             ],
         },
@@ -42,9 +42,3 @@ const CreateIntern = new mongoose.Schema(
 
 module.exports = mongoose.model("Intern", CreateIntern);
 
-
-// { name: {mandatory},
-//  email: {mandatory, valid email, unique},
-//  mobile: {mandatory, valid mobile number, unique},
-//   collegeId: {ObjectId, ref to college model,
-//     isDeleted: {boolean, default: false}}

@@ -1,15 +1,17 @@
 const CollegeModel = require("../models/CollegeModel")
-const InternModels = require("../models/InternModel")
-
-
+const InternModel = require("../models/InternModel")
 
 const isValid = function (value) {
     if (typeof value == undefined || value == null) return false
     if (typeof value === 'string' && value.trim().length === 0) return false
     return true
 }
-
-// create college controller
+const isValidname = function (value) {
+    if (!(value === value.toLowerCase())) {
+        return false
+    }
+    return true
+}
 
 const CreateCollege = async function (req, res) {
 
@@ -20,14 +22,19 @@ const CreateCollege = async function (req, res) {
 
             if (!isValid(data.name)) { return res.status(400).send({ status: false, msg: "Name is required" }) }
             if (!isValid(data.fullName)) { return res.status(400).send({ status: false, msg: "Full Name is required" }) }
+            if (!isValid(data.logoLink)) { return res.status(400).send({ status: false, msg: "logoLink is required" }) }
+            if (!isValidname(data.name)) { return res.status(400).send({ status: false, msg: "lowercase is required" }) }
 
-            //if((/((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/.test(data.logoLink))){    
+
+           let checkNameCollege = await CollegeModel.findOne({ name: data.name })
+            if (checkNameCollege) { return res.status(400).send({ msg: "Name Already exist" }) }
+
 
             const savedData = await CollegeModel.create(data)
 
             return res.status(201).send({ status: "College Created", savedData })
 
-            // }else{res.send({msg : "please enter a valid URL"})}
+
 
         } else { res.send({ msg: "please enter some data" }) }
 
@@ -35,5 +42,32 @@ const CreateCollege = async function (req, res) {
         return res.status(500).send({ ERROR: err.message })
     }
 }
+const CollegeDetails = async function (req, res) {
+    try {
+        let collegeName = req.query.collegeName
+        if (!collegeName) { return res.status(400).send({ status: false, ERROR: "Please provide collegeName in query" }) }
+        let resCollege = await CollegeModel.findOne({ name: collegeName })
+        if (!resCollege) { return res.status(404).send({ status: false, Error: "no college found" }) }
+
+        let presentIntern = await InternModel.find({ collegeId: resCollege._id })
+        let result = { name: resCollege.name, fullName: resCollege.fullName, logoLink: resCollege.logoLink }
+        if (presentIntern.length > 0) {
+            result["Interest"] = presentIntern
+
+            return res.status(200).send({ data: result })
+        }
+
+        if (presentIntern.length == 0) {
+            result["Interest"] = "no intern for now";
+            return res.status(200).send({ data: result })
+        }
+
+
+    } catch (err) {
+        return res.status(500).send({ ERROR: err.message })
+    }
+
+}
 
 module.exports.CreateCollege = CreateCollege
+module.exports.CollegeDetails = CollegeDetails
