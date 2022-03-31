@@ -9,7 +9,7 @@ const isValid = function (value) {
 }
 
 const isRightFormatISBN = function (ISBN) {
-    return /^\+?([1-9]{4})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{5})$/.test(ISBN);
+    return /^\+?([1-9]{3})\)?[-. ]?([0-9]{10})$/.test(ISBN);
 }
 
 const isValidObjectId = function (objectId) {
@@ -135,11 +135,12 @@ const updateBooks = async function (req, res) {
     try {
         let book_Id = req.params.bookId
         let data = req.body
-        if (!book_Id) return res.status(400).send({ status: false, message: "Book Id is required" })
+        if (Object.keys(book_Id) == 0) return res.status(400).send({ status: false, message: "Book Id is required" })
+
+        if(!isValidObjectId(book_Id)) { return res.status(400).send({ status: false, message: 'please provide a valid id' })}
 
         if (Object.keys(data) == 0) { return res.status(400).send({ status: false, message: 'No data provided' }) }
 
-        if(!isValidObjectId(book_Id)) { return res.status(400).send({ status: false, message: 'please provide a valid id' })}
 
         let book = await bookModel.findById(book_Id)
         if (!book) return res.status(404).send({ status: false, message: "Book does not exists" })
